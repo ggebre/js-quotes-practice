@@ -27,13 +27,39 @@ document.addEventListener("DOMContentLoaded", () => {
             
             deleteQuoteById(id)
             // .then(renderAllQuotes())
+            renderAllQuotes()
         }
         if(event.target.className == "btn-success"){
             likeQuoteById(id)
             .then(resp => resp.json())
             // .then(renderAllQuotes())
+            renderAllQuotes()
         }
-        renderAllQuotes()
+        
+        if(event.target.className == "btn-warning"){
+            // display a hidden form below each
+            
+            const editForm = document.querySelector(`#form-${id}`)
+            fetchQueteById(id)
+            .then(quoteObj => {
+                editForm.innerHTML = renderEditFormInputsOfAQuote(quoteObj)
+            })
+
+            editForm.addEventListener('submit', event => {
+                const quote = event.target.quote.value
+                const author = event.target.author.value
+
+                updateQueteById(id, {quote, author})
+                .then(resp => resp.json())
+                .then(quoteObj => console.log(quoteObj))
+
+                editForm.innerHTML = ""
+                event.preventDefault()
+            },false)
+            
+            
+        }
+        // renderAllQuotes()
     })
     function deleteQuoteById(id){
         return fetch(`http://localhost:3000/quotes/${id}`, {
@@ -79,6 +105,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <br>
         <button class='btn-success' data-id=${id}>Likes: <span>${likes.length}</span></button>
         <button class='btn-danger'data-id=${id}>Delete</button>
+        <button class='btn-warning'data-id=${id}>Edit</button> <br>
+        <form id=form-${id} action=# method=POST>
+            
+        </form>
       </blockquote>
     </li> 
         `
@@ -93,6 +123,35 @@ document.addEventListener("DOMContentLoaded", () => {
               },
               body: JSON.stringify(quoteObj)
         })
+    } 
+    function fetchQueteById(id){
+        return fetch(`http://localhost:3000/quotes/${id}`)
+        .then(resp => resp.json())
     }
+
+    function updateQueteById(id, updatedQuete){
+        return fetch(`http://localhost:3000/quotes/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                'Accept': "application/json"
+              },
+              body: JSON.stringify(updatedQuete)
+        })
+    }
+    function renderEditFormInputsOfAQuote({quote, author}){
+        
+        return `<div class="form-group">
+                <label for="new-quote">Quote</label>
+                <textarea name="quote"  class="form-control" id="new-quote" > ${quote} </textarea>
+            </div>
+            <div class="form-group">
+                <label for="Author">Author</label>
+                <textarea name="author"  class="form-control" id="author" > ${author} </textarea>
+            </div>
+    <button type="submit" class="btn btn-primary">Edit</button>`
+    }
+
+
     
 })
