@@ -2,8 +2,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const quoteList = document.querySelector("#quote-list")
     const newQuoteForm = document.querySelector("#new-quote-form")
     const inputs = document.querySelectorAll(".form-control")
-    let newQuote = {likes: "0"}
+    // const sortButton = document.querySelector("#sort-button")
 
+    let newQuote = {likes: "0"}
+    
     renderAllQuotes()
     newQuoteForm.addEventListener('submit', (event) => {
         for(const input of inputs){
